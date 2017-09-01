@@ -33,11 +33,22 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/next_button"
+
+    <ImageButton
+        android:id="@+id/prev_button"
+        android:contentDescription="@string/previous_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:text="@string/next_button"/>
+        android:layout_gravity="bottom|start"
+        android:src="@drawable/arrow_left"/>
+
+    <ImageButton
+        android:id="@+id/next_button"
+        android:contentDescription="@string/next_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:src="@drawable/arrow_right"/>
+
 
 </FrameLayout>

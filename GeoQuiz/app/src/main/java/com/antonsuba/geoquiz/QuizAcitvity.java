@@ -19,6 +19,8 @@ public class QuizAcitvity extends AppCompatActivity {
 
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
+    private static final String KEY_SCORE = "score";
+    private static final String KEY_ANSWERED_QUESTIONS = "answeredQuestions";
 
     private Question[] mQuestionBank = new Question[] {
             new Question(R.string.question_australia, true),
@@ -30,6 +32,10 @@ public class QuizAcitvity extends AppCompatActivity {
     };
 
     private int mQuestionCounter = 0;
+    private int mCorrectAnswerCount = 0;
+
+    private int mAnsweredCounter = 0;
+    private boolean[] mAnsweredQuestions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +45,9 @@ public class QuizAcitvity extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             mQuestionCounter = savedInstanceState.getInt(KEY_INDEX);
+            mAnsweredQuestions = savedInstanceState.getBooleanArray(KEY_ANSWERED_QUESTIONS);
+        } else {
+            mAnsweredQuestions = initAnsweredQuestions(mQuestionBank.length);
         }
 
         mQuestionTextView = (TextView) findViewById(R.id.question_text_view);
@@ -54,6 +63,7 @@ public class QuizAcitvity extends AppCompatActivity {
         mTrueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                toggleAnswerButtons(false);
                 checkAnswer(true);
             }
         });
@@ -62,6 +72,7 @@ public class QuizAcitvity extends AppCompatActivity {
         mFalseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                toggleAnswerButtons(false);
                 checkAnswer(false);
             }
         });
@@ -111,6 +122,8 @@ public class QuizAcitvity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         Log.i(TAG, "onSaveInstanceState");
         outState.putInt(KEY_INDEX, mQuestionCounter);
+        outState.putInt(KEY_SCORE, mCorrectAnswerCount);
+        outState.putBooleanArray(KEY_ANSWERED_QUESTIONS, mAnsweredQuestions);
     }
 
     @Override
@@ -126,21 +139,58 @@ public class QuizAcitvity extends AppCompatActivity {
     }
 
     private void updateQuestion() {
-        int question = mQuestionBank[mQuestionCounter].getTextResId();
-        mQuestionTextView.setText(question);
+        Question question = mQuestionBank[mQuestionCounter];
+        int questionTextId = question.getTextResId();
+        mQuestionTextView.setText(questionTextId);
+
+        if (mAnsweredQuestions[mQuestionCounter]) {
+            mTrueButton.setEnabled(false);
+            mFalseButton.setEnabled(false);
+        } else {
+            mTrueButton.setEnabled(true);
+            mFalseButton.setEnabled(true);
+        }
     }
 
     private void checkAnswer(boolean userAnswer) {
-        boolean isAnswerTrue = mQuestionBank[mQuestionCounter].isAnswerTrue();
+        Question question = mQuestionBank[mQuestionCounter];
+        boolean isAnswerTrue = question.isAnswerTrue();
 
         int messageResId;
 
         if (userAnswer == isAnswerTrue) {
             messageResId = R.string.correct_toast;
+            mCorrectAnswerCount++;
         } else {
             messageResId = R.string.incorrect_toast;
         }
 
-        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+        mAnsweredCounter++;
+        mAnsweredQuestions[mQuestionCounter] = true;
+
+        if (mAnsweredCounter >= mQuestionBank.length) {
+            String resultMessage = getResources().getString(messageResId);
+            String scoreMessage = getResources().getString(R.string.score_toast);
+            int percentage = (mCorrectAnswerCount * 100) / mQuestionBank.length;
+
+            String finalMessage = resultMessage + ". " + scoreMessage + " " + percentage + "%";
+
+            Toast.makeText(this, finalMessage, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void toggleAnswerButtons(boolean setting) {
+        mTrueButton.setEnabled(setting);
+        mFalseButton.setEnabled(setting);
+    }
+
+    private boolean[] initAnsweredQuestions(int length) {
+        boolean[] answeredQuestions = new boolean[length];
+        for (int i = 0; i < length; i++) {
+            answeredQuestions[i] = false;
+        }
+        return answeredQuestions;
     }
 }
