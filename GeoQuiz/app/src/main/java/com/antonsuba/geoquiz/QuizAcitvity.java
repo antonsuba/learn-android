@@ -16,7 +16,9 @@ public class QuizAcitvity extends AppCompatActivity {
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
     private static final String KEY_SCORE = "score";
+    private static final String KEY_ANSWERED_COUNTER = "answeredCounter";
     private static final String KEY_ANSWERED_QUESTIONS = "answeredQuestions";
+    private static final String KEY_IS_CHEATER = "isCheater";
     private static final int REQUEST_CODE_CHEAT = 0;
 
     private TextView mQuestionTextView;
@@ -40,8 +42,7 @@ public class QuizAcitvity extends AppCompatActivity {
 
     private int mAnsweredCounter = 0;
     private boolean[] mAnsweredQuestions;
-
-    private boolean mIsCheater;
+    private boolean[] mIsCheater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +52,12 @@ public class QuizAcitvity extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             mQuestionCounter = savedInstanceState.getInt(KEY_INDEX);
+            mAnsweredCounter =savedInstanceState.getInt(KEY_ANSWERED_COUNTER);
             mAnsweredQuestions = savedInstanceState.getBooleanArray(KEY_ANSWERED_QUESTIONS);
+            mIsCheater = savedInstanceState.getBooleanArray(KEY_IS_CHEATER);
         } else {
             mAnsweredQuestions = initAnsweredQuestions(mQuestionBank.length);
+            mIsCheater = initIsCheater(mQuestionBank.length);
         }
 
         mQuestionTextView = (TextView) findViewById(R.id.question_text_view);
@@ -89,7 +93,6 @@ public class QuizAcitvity extends AppCompatActivity {
             public void onClick(View v) {
                 int length = mQuestionBank.length;
                 mQuestionCounter = ((((mQuestionCounter - 1) % length) + length) % length);
-                mIsCheater = false;
                 updateQuestion();
             }
         });
@@ -99,7 +102,6 @@ public class QuizAcitvity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mQuestionCounter = (mQuestionCounter + 1) % mQuestionBank.length;
-                mIsCheater = false;
                 updateQuestion();
             }
         });
@@ -153,7 +155,9 @@ public class QuizAcitvity extends AppCompatActivity {
         Log.i(TAG, "onSaveInstanceState");
         outState.putInt(KEY_INDEX, mQuestionCounter);
         outState.putInt(KEY_SCORE, mCorrectAnswerCount);
+        outState.putInt(KEY_ANSWERED_COUNTER, mAnsweredCounter);
         outState.putBooleanArray(KEY_ANSWERED_QUESTIONS, mAnsweredQuestions);
+        outState.putBooleanArray(KEY_IS_CHEATER, mIsCheater);
     }
 
     @Override
@@ -168,7 +172,7 @@ public class QuizAcitvity extends AppCompatActivity {
             if (data == null) {
                 return;
             }
-            mIsCheater = CheatActivity.wasAnswerShown(data);
+            mIsCheater[mQuestionCounter] = CheatActivity.wasAnswerShown(data);
         }
     }
 
@@ -192,7 +196,7 @@ public class QuizAcitvity extends AppCompatActivity {
 
         int messageResId;
 
-        if (mIsCheater) {
+        if (mIsCheater[mQuestionCounter]) {
             messageResId = R.string.judgement_toast;
         }
         else if (userAnswer == isAnswerTrue) {
@@ -229,5 +233,13 @@ public class QuizAcitvity extends AppCompatActivity {
             answeredQuestions[i] = false;
         }
         return answeredQuestions;
+    }
+
+    private boolean[] initIsCheater(int length) {
+        boolean[] isCheater = new boolean[length];
+        for (int i = 0; i < length; i++) {
+            isCheater[i] = false;
+        }
+        return isCheater;
     }
 }
