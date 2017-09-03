@@ -18,6 +18,7 @@ public class QuizAcitvity extends AppCompatActivity {
     private static final String KEY_SCORE = "score";
     private static final String KEY_ANSWERED_COUNTER = "answeredCounter";
     private static final String KEY_ANSWERED_QUESTIONS = "answeredQuestions";
+    private static final String KEY_CHEAT_COUNTER = "cheatCounter";
     private static final String KEY_IS_CHEATER = "isCheater";
     private static final int REQUEST_CODE_CHEAT = 0;
 
@@ -27,6 +28,7 @@ public class QuizAcitvity extends AppCompatActivity {
     private ImageButton mPrevButton;
     private ImageButton mNextButton;
     private Button mCheatButton;
+    private TextView mCheatCounterTextView;
 
     private Question[] mQuestionBank = new Question[] {
             new Question(R.string.question_australia, true),
@@ -41,6 +43,7 @@ public class QuizAcitvity extends AppCompatActivity {
     private int mCorrectAnswerCount = 0;
 
     private int mAnsweredCounter = 0;
+    private int mCheatCounter = 3;
     private boolean[] mAnsweredQuestions;
     private boolean[] mIsCheater;
 
@@ -54,6 +57,7 @@ public class QuizAcitvity extends AppCompatActivity {
             mQuestionCounter = savedInstanceState.getInt(KEY_INDEX);
             mAnsweredCounter =savedInstanceState.getInt(KEY_ANSWERED_COUNTER);
             mAnsweredQuestions = savedInstanceState.getBooleanArray(KEY_ANSWERED_QUESTIONS);
+            mCheatCounter = savedInstanceState.getInt(KEY_CHEAT_COUNTER);
             mIsCheater = savedInstanceState.getBooleanArray(KEY_IS_CHEATER);
         } else {
             mAnsweredQuestions = initAnsweredQuestions(mQuestionBank.length);
@@ -116,6 +120,9 @@ public class QuizAcitvity extends AppCompatActivity {
             }
         });
 
+        mCheatCounterTextView = (TextView) findViewById(R.id.cheat_count_text_view);
+        updateCheats();
+
         updateQuestion();
     }
 
@@ -156,6 +163,7 @@ public class QuizAcitvity extends AppCompatActivity {
         outState.putInt(KEY_INDEX, mQuestionCounter);
         outState.putInt(KEY_SCORE, mCorrectAnswerCount);
         outState.putInt(KEY_ANSWERED_COUNTER, mAnsweredCounter);
+        outState.putInt(KEY_CHEAT_COUNTER, mCheatCounter);
         outState.putBooleanArray(KEY_ANSWERED_QUESTIONS, mAnsweredQuestions);
         outState.putBooleanArray(KEY_IS_CHEATER, mIsCheater);
     }
@@ -172,7 +180,13 @@ public class QuizAcitvity extends AppCompatActivity {
             if (data == null) {
                 return;
             }
-            mIsCheater[mQuestionCounter] = CheatActivity.wasAnswerShown(data);
+            boolean answerShown = CheatActivity.wasAnswerShown(data);
+            mIsCheater[mQuestionCounter] = answerShown;
+
+            if (answerShown) {
+                mCheatCounter--;
+                updateCheats();
+            }
         }
     }
 
@@ -182,11 +196,9 @@ public class QuizAcitvity extends AppCompatActivity {
         mQuestionTextView.setText(questionTextId);
 
         if (mAnsweredQuestions[mQuestionCounter]) {
-            mTrueButton.setEnabled(false);
-            mFalseButton.setEnabled(false);
+            toggleAnswerButtons(false);
         } else {
-            mTrueButton.setEnabled(true);
-            mFalseButton.setEnabled(true);
+            toggleAnswerButtons(true);
         }
     }
 
@@ -225,6 +237,15 @@ public class QuizAcitvity extends AppCompatActivity {
     private void toggleAnswerButtons(boolean setting) {
         mTrueButton.setEnabled(setting);
         mFalseButton.setEnabled(setting);
+    }
+
+    private void updateCheats() {
+        String cheatCounterText = getResources().getString(R.string.cheat_count_text, mCheatCounter);
+        mCheatCounterTextView.setText(cheatCounterText);
+
+        if (mCheatCounter <= 0) {
+            mCheatButton.setEnabled(false);
+        }
     }
 
     private boolean[] initAnsweredQuestions(int length) {

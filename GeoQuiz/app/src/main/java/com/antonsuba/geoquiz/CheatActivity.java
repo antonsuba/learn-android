@@ -20,6 +20,7 @@ public class CheatActivity extends AppCompatActivity {
     private static final String KEY_IS_CHEATER = "isCheater";
 
     private TextView mAnswerTextView;
+    private TextView mAPILevelTextView;
     private Button mShowAnswerButton;
 
     private boolean mAnswerIsTrue;
@@ -40,7 +41,7 @@ public class CheatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cheat);
 
-        mAnswerTextView = (TextView)findViewById(R.id.answer_text_view);
+        mAnswerTextView = (TextView) findViewById(R.id.answer_text_view);
 
         if (savedInstanceState != null) {
             mAnswerIsTrue = savedInstanceState.getBoolean(KEY_QUIZ_ANSWER);
@@ -52,7 +53,7 @@ public class CheatActivity extends AppCompatActivity {
             mAnswerIsTrue = getIntent().getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false);
         }
 
-        mShowAnswerButton = (Button)findViewById(R.id.show_answer_button);
+        mShowAnswerButton = (Button) findViewById(R.id.show_answer_button);
         mShowAnswerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,6 +79,10 @@ public class CheatActivity extends AppCompatActivity {
                 }
             }
         });
+
+        String apiLevelText = getResources().getString(R.string.api_level, Build.VERSION.SDK_INT);
+        mAPILevelTextView = (TextView)findViewById(R.id.api_level_text_view);
+        mAPILevelTextView.setText(apiLevelText);
     }
 
     @Override
