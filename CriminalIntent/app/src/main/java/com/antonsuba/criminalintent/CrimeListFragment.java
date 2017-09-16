@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -52,19 +54,23 @@ public class CrimeListFragment extends Fragment {
 
         private Crime mCrime;
 
-        public CrimeHolder(LayoutInflater inflater, ViewGroup parent, int layoutId) {
+        private DateFormat mDateFormat;
+
+        public CrimeHolder(LayoutInflater inflater, ViewGroup parent, int layoutId, DateFormat dateFormat) {
             super(inflater.inflate(layoutId, parent, false));
             itemView.setOnClickListener(this);
 
             mTitleTextView = itemView.findViewById(R.id.crime_title);
             mDateTextView = itemView.findViewById(R.id.crime_date);
             mSolvedImageView = itemView.findViewById(R.id.crime_solved);
+
+            mDateFormat = dateFormat;
         }
 
         public void bind(Crime crime) {
             mCrime = crime;
             mTitleTextView.setText(crime.getTitle());
-            mDateTextView.setText(crime.getDate().toString());
+            mDateTextView.setText(mDateFormat.format(crime.getDate()));
             mSolvedImageView.setVisibility(crime.isSolved() ? View.VISIBLE : View.GONE);
         }
 
@@ -82,8 +88,11 @@ public class CrimeListFragment extends Fragment {
 
         private List<Crime> mCrimeList;
 
+        private DateFormat mDateFormat;
+
         public CrimeAdapter(List<Crime> crimes) {
             mCrimeList = crimes;
+            mDateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
         }
 
         @Override
@@ -91,9 +100,9 @@ public class CrimeListFragment extends Fragment {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
 
             if (viewType == NORMAL_VIEW_TYPE) {
-                return new CrimeHolder(layoutInflater, parent, R.layout.list_item_crime);
+                return new CrimeHolder(layoutInflater, parent, R.layout.list_item_crime, mDateFormat);
             } else if (viewType == SERIOUS_VIEW_TYPE) {
-                return new CrimeHolder(layoutInflater, parent, R.layout.list_item_serious_crime);
+                return new CrimeHolder(layoutInflater, parent, R.layout.list_item_serious_crime, mDateFormat);
             }
             return null;
         }
