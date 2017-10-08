@@ -1,5 +1,7 @@
 package com.antonsuba.criminalintent;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -31,14 +33,22 @@ public class CrimeFragment extends Fragment{
     private DateFormat mDateFormat;
 
     private static final String ARG_CRIME_ID = "crime_id";
+    private static final String ARG_CRIME_POSITION = "crime_position";
 
-    public static CrimeFragment newInstance(UUID crimeId) {
+    private static final String EXTRA_CRIME_POSITION = "crime_position";
+
+    public static CrimeFragment newInstance(UUID crimeId, int position) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_CRIME_ID, crimeId);
+        args.putInt(ARG_CRIME_POSITION, position);
 
         CrimeFragment fragment = new CrimeFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public static int getCrimePosition(Intent data) {
+        return data.getIntExtra(EXTRA_CRIME_POSITION, -1);
     }
 
     @Override
@@ -48,6 +58,9 @@ public class CrimeFragment extends Fragment{
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
 
         mDateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
+
+        int position = getArguments().getInt(ARG_CRIME_POSITION);
+        returnResult(position);
     }
 
     @Nullable
@@ -88,5 +101,11 @@ public class CrimeFragment extends Fragment{
         });
 
         return view;
+    }
+
+    public void returnResult(int position) {
+        Intent data = new Intent();
+        data.putExtra(EXTRA_CRIME_POSITION, position);
+        getActivity().setResult(Activity.RESULT_OK, data);
     }
 }

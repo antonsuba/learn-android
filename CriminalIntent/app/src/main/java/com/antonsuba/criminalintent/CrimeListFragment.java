@@ -1,5 +1,6 @@
 package com.antonsuba.criminalintent;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -25,6 +26,10 @@ public class CrimeListFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private CrimeAdapter mCrimeAdapter;
+
+    private int mCrimePosition;
+
+    private static final int REQUEST_CRIME = 1;
 
     @Nullable
     @Override
@@ -53,7 +58,16 @@ public class CrimeListFragment extends Fragment {
             mCrimeAdapter = new CrimeAdapter(crimes);
             mRecyclerView.setAdapter(mCrimeAdapter);
         } else {
-            mCrimeAdapter.notifyDataSetChanged();
+            mCrimeAdapter.notifyItemChanged(mCrimePosition);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK) return;
+
+        if (requestCode == REQUEST_CRIME) {
+            mCrimePosition = CrimeFragment.getCrimePosition(data);
         }
     }
 
@@ -89,7 +103,7 @@ public class CrimeListFragment extends Fragment {
         public void onClick(View view) {
             int position = getAdapterPosition();
             Intent intent = CrimeActivity.newInent(getActivity(), mCrime.getId(), position);
-            startActivity(intent);
+            startActivityForResult(intent, REQUEST_CRIME);
         }
     }
 
