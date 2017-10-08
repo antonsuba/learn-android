@@ -13,6 +13,10 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.UUID;
+
 /**
  * @author Anton Suba
  */
@@ -24,10 +28,26 @@ public class CrimeFragment extends Fragment{
     private Button mDateButton;
     private CheckBox mCheckBox;
 
+    private DateFormat mDateFormat;
+
+    private static final String ARG_CRIME_ID = "crime_id";
+
+    public static CrimeFragment newInstance(UUID crimeId) {
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_CRIME_ID, crimeId);
+
+        CrimeFragment fragment = new CrimeFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mCrime = new Crime();
+        UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
+        mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
+
+        mDateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
     }
 
     @Nullable
@@ -36,6 +56,7 @@ public class CrimeFragment extends Fragment{
         View view = inflater.inflate(R.layout.fragment_crime, container, false);
 
         mTitleField = view.findViewById(R.id.crime_title);
+        mTitleField.setText(mCrime.getTitle());
         mTitleField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -54,10 +75,11 @@ public class CrimeFragment extends Fragment{
         });
 
         mDateButton = view.findViewById(R.id.crime_date);
-        mDateButton.setText(mCrime.getDate().toString());
+        mDateButton.setText(mDateFormat.format(mCrime.getDate()));
         mDateButton.setEnabled(false);
 
         mCheckBox = view.findViewById(R.id.crime_solved);
+        mCheckBox.setChecked(mCrime.isSolved());
         mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
