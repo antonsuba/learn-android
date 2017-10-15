@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.util.List;
@@ -102,7 +100,7 @@ public class CrimeListFragment extends Fragment {
         @Override
         public void onClick(View view) {
             int position = getAdapterPosition();
-            Intent intent = CrimeActivity.newInent(getActivity(), mCrime.getId(), position);
+            Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId(), position);
             startActivityForResult(intent, REQUEST_CRIME);
         }
     }
