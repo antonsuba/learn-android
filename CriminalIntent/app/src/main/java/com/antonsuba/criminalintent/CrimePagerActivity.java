@@ -9,7 +9,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +25,8 @@ public class CrimePagerActivity extends AppCompatActivity {
     private static final String EXTRA_POSITION_ID = "com.antonsuba.criminalintent.position_id";
 
     private ViewPager mViewPager;
+    private Button mJumpToFirstButton;
+    private Button mJumpToLastButton;
     private List<Crime> mCrimeList;
 
     public static Intent newIntent(Context packageContext, UUID crimeId, int position) {
@@ -55,6 +58,22 @@ public class CrimePagerActivity extends AppCompatActivity {
             @Override
             public int getCount() {
                 return mCrimeList.size();
+            }
+        });
+
+        mJumpToFirstButton = findViewById(R.id.jump_to_first);
+        mJumpToFirstButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mViewPager.setCurrentItem(0);
+            }
+        });
+
+        mJumpToLastButton = findViewById(R.id.jump_to_last);
+        mJumpToLastButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mViewPager.setCurrentItem(mCrimeList.size());
             }
         });
 
