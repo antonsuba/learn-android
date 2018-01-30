@@ -19,8 +19,8 @@ public class Crime {
         mDate = new Date();
     }
 
-    public void setId(UUID id) {
-        mId = id;
+    public UUID getId() {
+        return mId;
     }
 
     public String getTitle() {
